@@ -64,7 +64,9 @@ def observable(key, notebook, targets=None, redefine={}, observe=[], hide=[]):
 
 
 if not _RELEASE:
-    observers = observable("World Tour!", 
+    import streamlit as st
+
+    observers = observable("World Tour!",
         notebook="@d3/world-tour", 
         targets=["canvas"], 
         observe=["name"]
