@@ -3,7 +3,7 @@ import {
   withStreamlitConnection,
   StreamlitComponentBase,
   Streamlit,
-} from "./streamlit"
+} from "streamlit-component-lib"
 import { Runtime, Inspector } from "@observablehq/runtime";
 
 class Observable extends StreamlitComponentBase<{}> {
@@ -32,6 +32,7 @@ class Observable extends StreamlitComponentBase<{}> {
     const observeSet = new Set(observe);
     const hideSet = new Set(hide);
     this.runtime = new Runtime();
+    // eslint-disable-next-line
     const { default: define } = await eval(`import("https://api.observablehq.com/${notebook}.js?v=3")`);
     this.main = this.runtime.module(define, (name: string) => {
       if (observeSet.has(name) && !targetSet.has(name)) {
@@ -51,7 +52,7 @@ class Observable extends StreamlitComponentBase<{}> {
       this.notebookRef.current?.appendChild(el);
 
       const i = new Inspector(el);
-      el.addEventListener('input', e => {
+      el.addEventListener('input', () => {
         Streamlit.setFrameHeight();
       })
       return {
@@ -74,7 +75,7 @@ class Observable extends StreamlitComponentBase<{}> {
         for (const [name, value] of initial) {
           // @ts-ignore
           this.observeValue[name] = value
-        };
+        }
         Streamlit.setComponentValue(this.observeValue);
       })
     }
