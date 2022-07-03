@@ -11,17 +11,25 @@ class Observable extends StreamlitComponentBase<{}> {
   private notebookRef = React.createRef<HTMLDivElement>();
   private runtime: any = null;
   private main: any = null;
+  private postponedArgs: any = null;
 
   componentWillUnmount() {
     this.runtime?.dispose();
   }
   // @ts-ignore
   public componentDidUpdate(prevProps: any) {
-    const { args: prevArgs } = prevProps;
-    if (prevArgs.notebook !== this.props.args.notebook) {
+    if (!this.main) {
+      this.postponedArgs = this.props.args
+      return
+    }
+    this.processUpdate(prevProps.args, this.props.args)
+  }
+
+  private processUpdate(prevArgs: any, nextArgs: any) {
+    if (prevArgs.notebook !== nextArgs.notebook) {
       // TODO handle new notebook
     }
-    this.redefineCells(this.main, this.props.args.redefine);
+    this.redefineCells(this.main, nextArgs.redefine);
   }
 
   async embedNotebook(notebook: string, targets: string[], observe: string[], hide:string[]) {
@@ -87,13 +95,17 @@ class Observable extends StreamlitComponentBase<{}> {
       main.redefine(cell, redefine[cell]);
     }
   }
-  componentDidMount() {
+  async componentDidMount() {
     const { notebook, targets = [], observe = [], redefine = {} , hide=[]} = this.props.args;
     Streamlit.setComponentValue(this.observeValue);
-    this.embedNotebook(notebook, targets, observe, hide).then(() => {
-      this.redefineCells(this.main, redefine);
+    await this.embedNotebook(notebook, targets, observe, hide).then(() => {
+      if (this.postponedArgs) {
+        this.processUpdate(this.props.args, this.postponedArgs);
+        this.postponedArgs = null;
+      } else {
+        this.redefineCells(this.main, redefine);
+      }
     });
-
   }
 
   public render = (): ReactNode => {
