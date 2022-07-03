@@ -81,7 +81,7 @@ class Observable extends StreamlitComponentBase<{}> {
     }
   }
 
-  redefineCells(main: any, redefine = {}) {
+  redefineCells(main: any, redefine: {[key: string]: any} = {}) {
     for (let cell in redefine) {
       //@ts-ignore
       main.redefine(cell, redefine[cell]);
@@ -114,7 +114,7 @@ class Observable extends StreamlitComponentBase<{}> {
           }}>
             <div style={{textAlign:"left"}}>{this.props.args.name}</div>
             <div style={{textAlign:"right"}}>
-            <a href={`https://observablehq.com/${this.props.args.notebook}`} style={{ color: '#666', }}>{this.props.args.notebook}</a>
+            <a target="_blank" rel="noopener noreferrer" href={`https://observablehq.com/${this.props.args.notebook}`} style={{ color: '#666', }}>{this.props.args.notebook}</a>
             </div>
           </div>
         </div>
