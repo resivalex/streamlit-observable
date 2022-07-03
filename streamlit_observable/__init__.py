@@ -1,7 +1,7 @@
 import os
 import streamlit.components.v1 as components
 
-_RELEASE = True
+_RELEASE = False
 
 if not _RELEASE:
     _component_func = components.declare_component(
@@ -14,7 +14,7 @@ else:
     _component_func = components.declare_component("observable", path=build_dir)
 
 
-def observable(key, notebook, targets=None, redefine={}, observe=[], hide=[]):
+def observable(key, notebook, targets=None, redefine={}, observe=[], hide=[], debounce=0):
     """Create a new instance of "observable".
 
     Parameters
@@ -39,6 +39,8 @@ def observable(key, notebook, targets=None, redefine={}, observe=[], hide=[]):
     hide: list or None
         An option list of strings that are the names of cells that will be embeded,
         but won't be rendered to the DOM.
+    debounce: float
+        Send value to Streamlit
     Returns
     -------
     dict
@@ -54,12 +56,14 @@ def observable(key, notebook, targets=None, redefine={}, observe=[], hide=[]):
         redefine=redefine,
         hide=hide,
         key=key,
-        name=key
+        name=key,
+        debounce=debounce
     )
     
     if component_value is None:
         return {}
 
+    print('component_value', component_value)
     return component_value
 
 
@@ -71,7 +75,8 @@ if not _RELEASE:
         targets=["canvas"], 
         observe=["name"]
     )
-    
+    print(observers)
+
     name = observers.get("name")
     
     st.write(f"Current country: ** *{name}* **")
